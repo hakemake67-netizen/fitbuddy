@@ -1,0 +1,6 @@
+{
+  "name": "FitBuddy - Cinematic AI Fitness Platform",
+  "description": "Premium AI fitness companion delivering personalized 7-day periodized training plans, unique exercise demo classes, real-time voice coaching, and authentic progress tracking.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
