@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitBuddy — Personalized Fitness Planning</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Scrolltide.co Signature Scroll Progress Track -->
+    <div class="scrolltide-progress-track" aria-hidden="true">
+        <div class="scrolltide-progress-bar" id="scrolltideProgressBar"></div>
+    </div>
+
+    <div class="ambient-glow" aria-hidden="true"></div>
+    <canvas id="cinematicMotionCanvas" class="cinematic-canvas" aria-hidden="true"></canvas>
+
+    <!-- Scrolltide.co Scroll Cue Indicator -->
+    <div class="scrolltide-cue" id="scrolltideCue" aria-hidden="true">
+        <span class="scrolltide-cue-line"></span>
+        <span>Scroll Tide</span>
+    </div>
+
+    <!-- Navigation -->
+    <header class="app-header">
+        <div class="nav-container">
+            <a href="/" class="brand-wrap" aria-label="FitBuddy Home">
+                <div class="brand-mark" aria-hidden="true">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                </div>
+                <span class="brand-name">FITBUDDY</span>
+            </a>
+
+            <nav class="nav-links" aria-label="Main Navigation">
+                <a href="#onboardingForm" class="nav-link active">Overview</a>
+                <a href="#onboardingForm" class="nav-link">7-Day Plan</a>
+                <a href="#onboardingForm" class="nav-link">Progress</a>
+                <a href="/view-all-users" class="nav-link nav-link-subtle">Admin Console</a>
+            </nav>
+
+            <!-- Interactive Random Color Button (Scrolltide) -->
+            <button 
+                type="button" 
+                class="btn-random-color" 
+                id="randomColorBtn"
+                onclick="changeRandomColor()" 
+                aria-label="Change random color"
+                title="Shuffle Random Accent Color"
+            >
+                <span class="random-color-indicator" id="randomColorIndicator"></span>
+                <span id="randomColorLabel">Random Color</span>
+                <svg id="randomColorIcon" class="random-color-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="16 3 21 3 21 8"></polyline>
+                    <line x1="4" y1="20" x2="21" y2="3"></line>
+                    <polyline points="21 16 21 21 16 21"></polyline>
+                    <line x1="15" y1="15" x2="21" y2="21"></line>
+                    <line x1="4" y1="4" x2="9" y2="9"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-container">
+        <!-- Hero Section -->
+        <section class="hero-layout scrolltide-reveal in-view" aria-labelledby="heroHeading">
+            <div class="hero-copy">
+                <div class="hero-tag">
+                    <span>AI-Assisted Fitness Planning</span>
+                </div>
+                <h1 class="hero-heading" id="heroHeading">
+                    Personalized training,<br>
+                    built around you.
+                </h1>
+                <p class="hero-subheading">
+                    Generate a structured 7-day fitness plan using your goals, experience and training intensity. Grounded in exercise physiology with targeted recovery guidance.
+                </p>
+                <div class="hero-actions">
+                    <a href="#onboardingForm" class="btn-primary">
+                        <span>Build My Plan</span>
+                    </a>
+                    <a href="/view-all-users" class="btn-ghost">
+                        <span>View Stored Plans</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Architectural Minimalist Visual -->
+            <div class="hero-visual-frame" aria-hidden="true">
+                <div class="ai-core-container">
+                    <div class="core-ring-outer"></div>
+                    <div class="core-ring-inner"></div>
+                    <div class="core-radar-sweep"></div>
+                    <div class="core-orb">
+                        <span class="core-orb-label">FitBuddy</span>
+                        <span class="core-orb-sub">Neural Engine</span>
+                        <div style="width: 50px; height: 12px; margin-top: 2px; overflow: hidden;">
+                            <svg viewBox="0 0 100 24" style="width: 100%; height: 100%;">
+                                <path 
+                                    d="M0 12 L25 12 L35 4 L45 20 L55 8 L65 15 L75 12 L100 12"
+                                    fill="none"
+                                    stroke="var(--accent)"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="core-satellite satellite-top-left">
+                        VO₂ MAX • 54.2
+                    </div>
+                    <div class="core-satellite satellite-bottom-right">
+                        RECOVERY • 98.4%
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Validation Notice -->
+        {% if error_message %}
+        <div class="notice-card notice-error" role="alert">
+            <div>
+                <strong>Validation Notice:</strong>
+                <span>{{ error_message }}</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Onboarding Form Panel -->
+        <section class="glass-panel scrolltide-reveal" id="onboardingForm" aria-labelledby="formTitle">
+            <div class="panel-header">
+                <div>
+                    <h2 class="panel-title" id="formTitle">Profile & Training Parameters</h2>
+                    <p class="panel-desc">Configure your athlete profile. Inputs are validated before generating your structured program.</p>
+                </div>
+            </div>
+
+            <form action="/generate-workout" method="POST" id="workoutForm">
+                <!-- Biometric Inputs -->
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label for="user_id" class="input-label">Athlete ID *</label>
+                        <input 
+                            type="text" 
+                            id="user_id" 
+                            name="user_id" 
+                            class="input-control" 
+                            placeholder="e.g. FB-1049" 
+                            value="{{ form_data.user_id if form_data else 'FB-1049' }}" 
+                            required
+                        >
+                    </div>
+
+                    <div class="input-group">
+                        <label for="username" class="input-label">Full Name *</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="input-control" 
+                            placeholder="e.g. Jordan Lee" 
+                            value="{{ form_data.username if form_data else 'Jordan Lee' }}" 
+                            required
+                        >
+                    </div>
+
+                    <div class="input-group">
+                        <label for="age" class="input-label">Age (Years) *</label>
+                        <input 
+                            type="number" 
+                            id="age" 
+                            name="age" 
+                            class="input-control" 
+                            min="14" 
+                            max="100" 
+                            placeholder="26" 
+                            value="{{ form_data.age if form_data else 26 }}" 
+                            required
+                        >
+                    </div>
+
+                    <div class="input-group">
+                        <label for="weight" class="input-label">Body Weight (kg) *</label>
+                        <input 
+                            type="number" 
+                            step="0.5" 
+                            id="weight" 
+                            name="weight" 
+                            class="input-control" 
+                            min="30" 
+                            max="250" 
+                            placeholder="72.0" 
+                            value="{{ form_data.weight if form_data else 72.0 }}" 
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- Hidden Input for Goal Submission -->
+                <input type="hidden" name="goal" id="goalInput" value="{{ form_data.goal if form_data else 'Muscle Gain' }}">
+
+                <!-- Fitness Goal Selection -->
+                <div style="margin-bottom: 2rem;">
+                    <span class="section-label">Primary Fitness Goal *</span>
+                    <div class="selector-grid">
+                        <div 
+                            class="choice-card {% if not form_data or form_data.goal == 'Muscle Gain' %}selected{% endif %}" 
+                            onclick="selectGoal(this, 'Muscle Gain')"
+                            role="button"
+                            tabindex="0"
+                        >
+                            <div class="choice-indicator"></div>
+                            <div class="choice-title">Muscle Gain</div>
+                            <div class="choice-desc">Progressive resistance training focused on hypertrophy and strength.</div>
+                        </div>
+
+                        <div 
+                            class="choice-card {% if form_data and form_data.goal == 'Weight Loss' %}selected{% endif %}" 
+                            onclick="selectGoal(this, 'Weight Loss')"
+                            role="button"
+                            tabindex="0"
+                        >
+                            <div class="choice-indicator"></div>
+                            <div class="choice-title">Weight Loss</div>
+                            <div class="choice-desc">Metabolic conditioning and lean preservation in a caloric deficit.</div>
+                        </div>
+
+                        <div 
+                            class="choice-card {% if form_data and form_data.goal == 'General Fitness' %}selected{% endif %}" 
+                            onclick="selectGoal(this, 'General Fitness')"
+                            role="button"
+                            tabindex="0"
+                        >
+                            <div class="choice-indicator"></div>
+                            <div class="choice-title">General Fitness</div>
+                            <div class="choice-desc">Balanced conditioning, joint mobility and long-term energy.</div>
+                        </div>
+
+                        <div 
+                            class="choice-card {% if form_data and form_data.goal == 'Strength' %}selected{% endif %}" 
+                            onclick="selectGoal(this, 'Strength')"
+                            role="button"
+                            tabindex="0"
+                        >
+                            <div class="choice-indicator"></div>
+                            <div class="choice-title">Strength</div>
+                            <div class="choice-desc">Compound movements with higher rest intervals and heavier loads.</div>
+                        </div>
+
+                        <div 
+                            class="choice-card {% if form_data and form_data.goal == 'Endurance' %}selected{% endif %}" 
+                            onclick="selectGoal(this, 'Endurance')"
+                            role="button"
+                            tabindex="0"
+                        >
+                            <div class="choice-indicator"></div>
+                            <div class="choice-title">Endurance</div>
+                            <div class="choice-desc">Cardiovascular stamina, sustained tempo and aerobic capacity.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden Input for Intensity Submission -->
+                <input type="hidden" name="intensity" id="intensityInput" value="{{ form_data.intensity if form_data else 'Intermediate' }}">
+
+                <!-- Training Intensity Selection -->
+                <div style="margin-bottom: 2.25rem;">
+                    <span class="section-label">Training Intensity *</span>
+                    <div class="selector-grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <div 
+                            class="choice-card {% if form_data and form_data.intensity == 'Beginner' %}selected{% endif %}" 
+                            onclick="selectIntensity(this, 'Beginner')"
+                            role="button"
+                            tabindex="0"
+                        >
+                            <div class="choice-indicator"></div>
+                            <div class="choice-title">Beginner</div>
+                            <div class="choice-desc">Foundational movement patterns, moderate volume and generous recovery.</div>
+                        </div>
+
+                        <div 
+                            class="choice-card {% if not form_data or form_data.intensity == 'Intermediate' %}selected{% endif %}" 
+                            onclick="selectIntensity(this, 'Intermediate')"
+                            role="button"
+                            tabindex="0"
+                        >
+                            <div class="choice-indicator"></div>
+                            <div class="choice-title">Intermediate</div>
+                            <div class="choice-desc">Structured periodization with balanced progressive overload.</div>
+                        </div>
+
+                        <div 
+                            class="choice-card {% if form_data and form_data.intensity == 'Advanced' %}selected{% endif %}" 
+                            onclick="selectIntensity(this, 'Advanced')"
+                            role="button"
+                            tabindex="0"
+                        >
+                            <div class="choice-indicator"></div>
+                            <div class="choice-title">Advanced</div>
+                            <div class="choice-desc">Higher training density, complex lifts and intensive work sets.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div>
+                    <button type="submit" class="btn-primary btn-block" id="generateBtn">
+                        <span>Build My Plan</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <!-- AI Generation Overlay (Minimal System Status Interface) -->
+    <div class="system-overlay" id="systemLoadingOverlay" aria-live="polite">
+        <div class="overlay-modal">
+            <div class="overlay-system-title">Building Your Plan</div>
+            <div class="overlay-status-text" id="overlayStatusMsg">Analyzing profile</div>
+            <div class="overlay-progress-track">
+                <div class="overlay-progress-fill" id="overlayProgressFill"></div>
+            </div>
+            <div class="overlay-sub">Processing biometric metrics and periodization structure</div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <p>FitBuddy • Naan Mudhalvan SkillWallet Project • Powered by Google Gemini</p>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
