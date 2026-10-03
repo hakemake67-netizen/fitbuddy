@@ -130,12 +130,12 @@ export default function OnboardingFlow({
         })
       });
 
+      const data = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error('Network error generating workout plan');
+        throw new Error(data?.error || `Plan generation failed (HTTP ${response.status}).`);
       }
 
-      const data = await response.json();
-      if (data.success && data.plan) {
+      if (data?.success && data.plan) {
         // Mark onboarding complete in storage
         try {
           localStorage.setItem('fitbuddy_onboarded', 'true');
@@ -145,14 +145,20 @@ export default function OnboardingFlow({
         clearTimeout(t2);
         onComplete(data.plan, data.user);
       } else {
-        throw new Error(data.error || 'Failed to create plan');
+        throw new Error(data?.error || 'The server returned an invalid plan response. Please try again.');
       }
     } catch (err: any) {
       console.error('Plan generation failed:', err);
       clearTimeout(t1);
       clearTimeout(t2);
       setIsSubmitting(false);
-      setApiError('Unable to generate your plan right now. Please check your connection and try again.');
+      setApiError(
+        err instanceof TypeError
+          ? 'Unable to reach the server. Check your connection and try again.'
+          : err instanceof Error
+            ? err.message
+            : 'Unable to generate your plan right now. Please try again.'
+      );
     }
   };
 
